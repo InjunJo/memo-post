@@ -1,6 +1,7 @@
 package com.example.memo.dto;
 
 import com.example.memo.entity.Post;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,12 +10,10 @@ import lombok.Setter;
 public class RequestPostDto {
 
     private Integer id;
-
     private String head;
-
     private String content;
-
     private String user_id;
+
     private String user_pwd;
 
     public RequestPostDto() {

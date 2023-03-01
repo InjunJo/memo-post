@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +35,9 @@ public class PostService {
 
     public ResponsePostDTO getPost(Integer postId){
 
-        return ResponsePostDTO.toPost(findById(postId));
+        Post post = findById(postId);
+
+        return ResponsePostDTO.toPost(post);
     }
 
     @Transactional
@@ -47,6 +47,7 @@ public class PostService {
 
         if(post.checkPwd(dto)){
             post.update(dto);
+
             return ResponsePostDTO.toPost(post);
 
         }else{
@@ -55,24 +56,19 @@ public class PostService {
     }
 
     @Transactional
-    public ResponseEntity<Void> deletePost(Integer id, RequestPostDto dto){
+    public ResponsePostDTO deletePost(Integer id, RequestPostDto dto){
 
-        Post post = null;
-
-        try {
-            post = findById(id);
-        }catch (PostNotFountException p){
-
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-        }
+        Post post = findById(id);
 
         if(post.checkPwd(dto)){
             postRepo.delete(post);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponsePostDTO.toPost(post);
+
         }else{
 
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+           throw new PostPwdNotCorrectException();
         }
+
 
     }
 
