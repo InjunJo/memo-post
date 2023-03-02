@@ -2,8 +2,6 @@ package com.example.memo.dto;
 
 import com.example.memo.entity.Post;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonFormat.Shape;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.Builder;

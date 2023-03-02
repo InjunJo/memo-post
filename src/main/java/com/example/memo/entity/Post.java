@@ -1,15 +1,17 @@
 package com.example.memo.entity;
 
 import com.example.memo.dto.RequestPostDto;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import lombok.AllArgsConstructor;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import lombok.Getter;
 
-@Entity
-@Getter
+
+@Getter @Entity
 public class Post extends TimeStamp{
 
     @Id @GeneratedValue
@@ -28,10 +30,13 @@ public class Post extends TimeStamp{
     @Column(name = "user_pwd", nullable = false)
     private String userPwd;
 
+
     public Post() {
     }
 
     public Post(RequestPostDto dto) {
+
+        Objects.requireNonNull(dto);
 
         this.head = dto.getHead();
         this.content = dto.getContent();
@@ -39,9 +44,11 @@ public class Post extends TimeStamp{
         this.userPwd = dto.getUser_pwd();
     }
 
-    public boolean checkPwd(RequestPostDto requestPostDto){
+    public boolean checkPwd(RequestPostDto dto){
 
-        String dtoPwd = requestPostDto.getUser_pwd();
+        Objects.requireNonNull(dto);
+
+        String dtoPwd = dto.getUser_pwd();
 
         if(this.userPwd.equals(dtoPwd)){
             return true;
@@ -51,10 +58,12 @@ public class Post extends TimeStamp{
         }
     }
 
-    public void update(RequestPostDto requestPostDto){
+    public void update(RequestPostDto dto){
 
-        this.head= requestPostDto.getHead();
-        this.content = requestPostDto.getContent();
+        Objects.requireNonNull(dto);
+
+        this.head= dto.getHead();
+        this.content = dto.getContent();
     }
 
 }

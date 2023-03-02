@@ -1,13 +1,14 @@
 package com.example.memo;
 
+import com.example.memo.entity.User;
 import com.example.memo.repository.PostJpaRepository;
+import com.example.memo.repository.UserJpaRepository;
 import com.example.memo.service.PostService;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest
 class MemoApplicationTests {
@@ -18,9 +19,9 @@ class MemoApplicationTests {
     @Autowired
     private PostJpaRepository postJpaRepository;
 
+    @Autowired
+    private UserJpaRepository userJpaRepository;
 
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Autowired
     private PostService postService;
@@ -34,7 +35,6 @@ class MemoApplicationTests {
     @Test
     void testReposi(){
 
-        System.out.println(entityManager);
     }
 
     @Test
@@ -64,5 +64,23 @@ class MemoApplicationTests {
         System.out.println(postService.getPost(5));
 
     }
+
+    @Test @Transactional
+    void testUserRepo(){
+        System.out.println(userJpaRepository);
+        /*User user = new User();
+
+        user.setUserId("dignzh");
+        user.setPwd("1234");
+
+        userJpaRepository.save(user);*/
+
+        /*Optional<User> opUser = userJpaRepository.findById(user.getUserId());
+
+        Assertions.assertEquals(user,opUser.get());*/
+
+    }
+
+
 
 }

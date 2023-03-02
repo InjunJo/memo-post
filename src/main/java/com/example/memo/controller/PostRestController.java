@@ -15,56 +15,56 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@Log4j2
-public class PostRestController {
+    @RestController
+    @Log4j2
+    public class PostRestController {
 
-    private final PostService postService;
+        private final PostService postService;
 
-    public PostRestController(PostService postService) {
-        this.postService = postService;
+        public PostRestController(PostService postService) {
+            this.postService = postService;
+        }
+
+        @GetMapping("/api/post/{id}")
+        public ResponseEntity<ResponsePostDTO> getPostOne(@PathVariable Integer id) {
+
+            ResponsePostDTO dto = postService.getPost(id);
+
+            return ResponseEntity.ok(dto);
+
+        }
+
+        @GetMapping("/api/posts")
+        public List<ResponsePostDTO> getPostList() {
+
+            return postService.getPostList();
+        }
+
+        @PutMapping("/api/post/{id}")
+        public ResponseEntity<Object> updatePost(@PathVariable Integer id,
+            @RequestBody RequestPostDto requestPostDto) {
+
+            ResponsePostDTO dto = postService.updatePost(id, requestPostDto);;
+
+            return ResponseEntity.status(HttpStatus.OK).body(dto);
+        }
+
+        @DeleteMapping("/api/post/{id}")
+        public ResponseEntity<Object> deletePost(@PathVariable Integer id,
+            @RequestBody RequestPostDto requestPostDto) {
+
+            ResponsePostDTO dto = postService.deletePost(id, requestPostDto);
+
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+
+        }
+
+
+        @PostMapping("/api/post")
+        public ResponsePostDTO savePost(@RequestBody RequestPostDto requestPostDto) {
+
+            return postService.savePost(requestPostDto);
+        }
+
+
     }
-
-    @GetMapping("/api/post/{id}")
-    public ResponseEntity<ResponsePostDTO> getPostOne(@PathVariable Integer id) {
-
-        ResponsePostDTO dto = postService.getPost(id);
-
-        return ResponseEntity.ok(dto);
-
-    }
-
-    @GetMapping("/api/posts")
-    public List<ResponsePostDTO> getPostList() {
-
-        return postService.getPostList();
-    }
-
-    @PutMapping("/api/post/{id}")
-    public ResponseEntity<Object> updatePost(@PathVariable Integer id,
-        @RequestBody RequestPostDto requestPostDto) {
-
-        ResponsePostDTO dto = postService.updatePost(id, requestPostDto);;
-
-        return ResponseEntity.status(HttpStatus.OK).body(dto);
-    }
-
-    @DeleteMapping("/api/post/{id}")
-    public ResponseEntity<Object> deletePost(@PathVariable Integer id,
-        @RequestBody RequestPostDto requestPostDto) {
-
-        ResponsePostDTO dto = postService.deletePost(id, requestPostDto);
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-
-    }
-
-
-    @PostMapping("/api/post")
-    public ResponsePostDTO savePost(@RequestBody RequestPostDto requestPostDto) {
-
-        return postService.savePost(requestPostDto);
-    }
-
-
-}
