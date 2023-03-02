@@ -20,9 +20,16 @@ public class User {
     @Column(nullable = false, name = "USER_PWD")
     private String pwd;
 
-    public User() {
+    @OneToMany(mappedBy = "user")
+    private List<PostTest> posts = new ArrayList<>();
 
+    public User() {
     }
 
-
+    @Override
+    public String toString() {
+        return "User{" +
+            "userId='" + userId + '\'' +
+            ", pwd='" + pwd + '\''+"}";
+    }
 }
