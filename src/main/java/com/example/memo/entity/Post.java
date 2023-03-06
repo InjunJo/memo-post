@@ -1,6 +1,6 @@
 package com.example.memo.entity;
 
-import com.example.memo.dto.RequestPostDto;
+import com.example.memo.dto.ReqPostDto;
 import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,9 +9,10 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import lombok.Getter;
+import lombok.Setter;
 
 
-@Getter @Entity
+@Getter @Entity @Setter
 public class Post extends TimeStamp{
 
     @Id @GeneratedValue
@@ -24,41 +25,23 @@ public class Post extends TimeStamp{
     @Column(name = "CONTENTS")
     private String content;
 
-    @Column(name = "user_id", nullable = false)
-    private String userId;
-
-    @Column(name = "user_pwd", nullable = false)
-    private String userPwd;
+    @ManyToOne
+    @JoinColumn(name = "USER_ID")
+    private User user;
 
 
     public Post() {
     }
 
-    public Post(RequestPostDto dto) {
+    public Post(ReqPostDto dto){
 
         Objects.requireNonNull(dto);
 
         this.head = dto.getHead();
         this.content = dto.getContent();
-        this.userId = dto.getUser_id();
-        this.userPwd = dto.getUser_pwd();
     }
 
-    public boolean checkPwd(RequestPostDto dto){
-
-        Objects.requireNonNull(dto);
-
-        String dtoPwd = dto.getUser_pwd();
-
-        if(this.userPwd.equals(dtoPwd)){
-            return true;
-        }else{
-
-            return false;
-        }
-    }
-
-    public void update(RequestPostDto dto){
+    public void update(ReqPostDto dto){
 
         Objects.requireNonNull(dto);
 

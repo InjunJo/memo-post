@@ -1,99 +1,79 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.RequestPostDto;
-import com.example.memo.dto.ResponsePostDTO;
+import com.example.memo.dto.ReqPostDto;
+import com.example.memo.dto.RespPostDto;
 import com.example.memo.entity.Post;
-import com.example.memo.execption.PostNotFountException;
-import com.example.memo.execption.PostPwdNotCorrectException;
+import com.example.memo.entity.User;
+import com.example.memo.execption.NotAuthException;
+import com.example.memo.execption.NotFoundPostException;
 import com.example.memo.repository.PostJpaRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Log4j2
+@Log4j2 @RequiredArgsConstructor
 public class PostService {
 
     private final PostJpaRepository postRepo;
 
-    public PostService(PostJpaRepository postRepo) {
-        this.postRepo = postRepo;
-    }
+    private final UserService userService;
 
     @Transactional
-    public ResponsePostDTO savePost(RequestPostDto dto){
+    public RespPostDto savePost(ReqPostDto dto, HttpServletRequest req) {
+
+        User user = userService.authorize(req);
 
         Post post = new Post(dto);
+
+        post.setUser(user);
         postRepo.save(post);
 
-        return ResponsePostDTO.toPost(post);
+        return new RespPostDto(post);
+    }
+
+    public List<RespPostDto> getPostList(){
+
+        List<Post> posts = postRepo.findAllByOrderByModifiedAtDesc();
+
+        return posts.stream().map(RespPostDto::new).collect(Collectors.toList());
 
     }
 
-    public ResponsePostDTO getPost(Integer postId){
+    public RespPostDto getPost(Integer postId){
 
-        Post post = findById(postId);
+        Post post = postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
 
-        return ResponsePostDTO.toPost(post);
-    }
-
-    @Transactional
-    public ResponsePostDTO updatePost(Integer postId, RequestPostDto dto){
-
-        Post post = findById(postId);
-
-        if(post.checkPwd(dto)){
-            post.update(dto);
-
-            return ResponsePostDTO.toPost(post);
-
-        }else{
-            throw new PostPwdNotCorrectException();
-        }
+        return new RespPostDto(post);
     }
 
     @Transactional
-    public ResponsePostDTO deletePost(Integer id, RequestPostDto dto){
+    public RespPostDto updatePost(Integer postId, ReqPostDto dto, HttpServletRequest req){
+        User user = userService.authorize(req);
+        Post post = postRepo.findByIdAndUser(postId,user)
+            .orElseThrow(NotAuthException::new);
 
-        Post post = findById(id);
+        post.update(dto);
 
-        if(post.checkPwd(dto)){
-            postRepo.delete(post);
-            return ResponsePostDTO.toPost(post);
-
-        }else{
-
-           throw new PostPwdNotCorrectException();
-        }
+        return new RespPostDto(post);
     }
 
+    @Transactional
+    public void deletePost(Integer id,HttpServletRequest req){
 
+        User user = userService.authorize(req);
 
-    public List<ResponsePostDTO> getPostList(){
+        postRepo.findById(id).orElseThrow(NotFoundPostException::new);
 
-        List<Post> postList = postRepo.findAllByOrderByModifiedAtDesc();
+        Post post = postRepo.findByIdAndUser(id,user)
+            .orElseThrow(NotAuthException::new);
 
-        List<ResponsePostDTO> RspDtoList = new ArrayList<>();
-
-        for(Post p : postList){
-
-            ResponsePostDTO dto = ResponsePostDTO.toPost(p);
-
-            RspDtoList.add(dto);
-
-        }
-
-        return RspDtoList;
-    }
-
-    private Post findById(Integer postId){
-
-        Optional<Post> opPost = postRepo.findById(postId);
-
-        return opPost.orElseThrow(PostNotFountException::new);
+        postRepo.delete(post);
     }
 
 }

@@ -1,30 +1,22 @@
 package com.example.memo.dto;
 
 import com.example.memo.entity.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Objects;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
-@Getter @Setter
+@Getter @RequiredArgsConstructor
 @ToString
 public class UserDTO {
+    @Pattern(regexp = "^[a-z0-9]{4,10}$")
+    private final String userId;
 
-    private String userId;
-
-    private String pwd;
-
-    public UserDTO() {
-    }
-
-    public UserDTO(User user){
-        this.userId = user.getUserId();
-        this.pwd = user.getPwd();
-    }
-
-    public UserDTO toDTO(User user){
-
-        return new UserDTO(user);
-    }
+    @Pattern(regexp = "^[a-zA-Z0-9]{8,15}$")
+    private final String password;
 
 }

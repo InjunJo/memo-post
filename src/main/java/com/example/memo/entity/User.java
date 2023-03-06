@@ -11,9 +11,10 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity @Getter
-@Setter
+@Setter @ToString
 public class User {
 
     @Id
@@ -21,11 +22,10 @@ public class User {
     private String userId;
 
     @Column(nullable = false, name = "USER_PWD")
-    private String pwd;
+    private String password;
 
     @OneToMany(mappedBy = "user")
-    private List<PostTest> posts = new ArrayList<>();
-
+    private List<Post> posts = new ArrayList<>();
     public User() {
     }
 
@@ -34,7 +34,7 @@ public class User {
         Objects.requireNonNull(dto);
 
         this.userId = dto.getUserId();
-        this.pwd = dto.getPwd();
+        this.password = dto.getPassword();
     }
 
 }
