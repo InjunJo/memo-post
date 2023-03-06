@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface PostJpaRepository extends JpaRepository<Post,Integer> {
+public interface PostJpaRepository extends JpaRepository<Post,Long> {
 
     List<Post> findAllByOrderByModifiedAtDesc();
 
-    Optional<Post> findByIdAndUser(Integer id, User user);
+    Optional<Post> findByIdAndUser(Long id, User user);
 
 }

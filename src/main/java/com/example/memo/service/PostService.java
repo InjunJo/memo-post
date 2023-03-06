@@ -7,7 +7,6 @@ import com.example.memo.entity.User;
 import com.example.memo.execption.NotAuthException;
 import com.example.memo.execption.NotFoundPostException;
 import com.example.memo.repository.PostJpaRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
@@ -45,7 +44,7 @@ public class PostService {
 
     }
 
-    public RespPostDto getPost(Integer postId){
+    public RespPostDto getPost(Long postId){
 
         Post post = postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
 
@@ -53,27 +52,47 @@ public class PostService {
     }
 
     @Transactional
-    public RespPostDto updatePost(Integer postId, ReqPostDto dto, HttpServletRequest req){
+    public RespPostDto updatePost(Long postId, ReqPostDto dto, HttpServletRequest req){
         User user = userService.authorize(req);
-        Post post = postRepo.findByIdAndUser(postId,user)
-            .orElseThrow(NotAuthException::new);
 
-        post.update(dto);
+        Post post = postRepo.findById(postId)
+            .orElseThrow(NotFoundPostException::new);
 
-        return new RespPostDto(post);
+        if(matchUserAndPost(user,post)){
+            post.update(dto);
+
+            return new RespPostDto(post);
+
+        }else{
+
+            throw new NotAuthException();
+        }
+
     }
 
     @Transactional
-    public void deletePost(Integer id,HttpServletRequest req){
+    public void deletePost(Long id,HttpServletRequest req){
 
         User user = userService.authorize(req);
 
-        postRepo.findById(id).orElseThrow(NotFoundPostException::new);
+        Post post = postRepo.findById(id).orElseThrow(NotFoundPostException::new);
 
-        Post post = postRepo.findByIdAndUser(id,user)
-            .orElseThrow(NotAuthException::new);
+        if(matchUserAndPost(user,post)){
+            postRepo.delete(post);
 
-        postRepo.delete(post);
+        }else{
+
+            throw new NotAuthException();
+        }
+
+    }
+
+    private boolean matchUserAndPost(User user, Post post){
+
+        String userId = user.getUserId();
+        String userIdFromPost = post.getUser().getUserId();
+
+        return userId.equals(userIdFromPost);
     }
 
 }

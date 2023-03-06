@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class RespPostDto {
 
-    private final Integer id;
+    private final Long id;
     private final String head;
     private final String content;
 

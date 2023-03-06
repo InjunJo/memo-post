@@ -26,19 +26,6 @@ public class PostRestController {
 
     private final PostService postService;
 
-        /*
-
-        @GetMapping("/api/posts")
-        public List<RespPostDto> getPostList() {
-
-            return postService.getPostList();
-        }
-
-
-
-        */
-
-
     @PostMapping("/api/post")
     public ResponseEntity<RespPostDto> savePost(@RequestBody ReqPostDto reqPostDto,
         HttpServletRequest req) {
@@ -55,7 +42,7 @@ public class PostRestController {
     }
 
     @GetMapping("/api/post/{id}")
-    public ResponseEntity<RespPostDto> getPost(@PathVariable Integer id) {
+    public ResponseEntity<RespPostDto> getPost(@PathVariable Long id) {
 
         RespPostDto dto = postService.getPost(id);
 
@@ -64,7 +51,7 @@ public class PostRestController {
     }
 
     @PutMapping("/api/post/{id}")
-    public ResponseEntity<RespPostDto> updatePost(@PathVariable Integer id,
+    public ResponseEntity<RespPostDto> updatePost(@PathVariable Long id,
         @RequestBody ReqPostDto dto, HttpServletRequest req) {
 
         RespPostDto respDto = postService.updatePost(id, dto,req);;
@@ -73,7 +60,7 @@ public class PostRestController {
     }
 
     @DeleteMapping("/api/post/{id}")
-    public ResponseEntity<Object> deletePost(@PathVariable Integer id,
+    public ResponseEntity<Object> deletePost(@PathVariable Long id,
         HttpServletRequest req) {
 
         postService.deletePost(id,req);

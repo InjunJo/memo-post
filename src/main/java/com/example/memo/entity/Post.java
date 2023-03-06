@@ -17,7 +17,7 @@ public class Post extends TimeStamp{
 
     @Id @GeneratedValue
     @Column(name = "POST_ID")
-    private Integer id;
+    private Long id;
 
     @Column(name = "HEAD", nullable = false)
     private String head;

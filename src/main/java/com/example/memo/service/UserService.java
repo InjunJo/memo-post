@@ -41,7 +41,6 @@ public class UserService {
     public void login(UserDTO dto, HttpServletResponse resp){
 
         Objects.requireNonNull(dto);
-        Objects.requireNonNull(resp);
 
         userRepo.findById(dto.getUserId()).orElseThrow(NotAuthException::new);
 
