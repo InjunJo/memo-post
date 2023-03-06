@@ -8,6 +8,9 @@ import com.example.memo.repository.UserJpaRepository;
 import com.example.memo.service.PostService;
 import java.util.List;
 import java.util.Optional;
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,9 @@ class MemoApplicationTests {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    @PersistenceContext
+    private EntityManager em;
 
 
     @Autowired
@@ -118,10 +124,22 @@ class MemoApplicationTests {
         user.setUserId("dignzh1");
         user.setPwd("1234");
 
-        List<PostTest> list = postTestRepository.findAllByUser(user);
+        List<PostTest> list = postTestRepository.findAllByUser_UserId("dignzh1");
 
         System.out.println(list);
 
+
+    }
+
+    @Test @Transactional
+    void postOfUser(){
+
+
+        Optional<User> op = userJpaRepository.findById("dignzh1");
+
+        User user = op.get();
+
+        System.out.println(user.getPosts());
 
     }
 

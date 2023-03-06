@@ -1,5 +1,7 @@
 package com.example.memo.entity;
 
+import com.example.memo.dto.PostDTO;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -25,11 +27,19 @@ public class PostTest extends TimeStamp {
     @Column
     private String content;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.MERGE)
     @JoinColumn(name = "USER_ID")
     private User user;
 
     public PostTest() {
+    }
+
+    public PostTest(PostDTO dto){
+
+        this.head = dto.getHead();
+        this.content = dto.getContent();
+        user = new User(dto.getUserDTO());
+
     }
 
     public PostTest(String head, String content, User user) {

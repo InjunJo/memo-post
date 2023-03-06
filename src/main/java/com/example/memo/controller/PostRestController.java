@@ -1,8 +1,10 @@
 package com.example.memo.controller;
 
+import com.example.memo.dto.PostDTO;
 import com.example.memo.dto.RequestPostDto;
 import com.example.memo.dto.ResponsePostDTO;
 import com.example.memo.service.PostService;
+import com.example.memo.service.PostTestService;
 import java.util.List;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
@@ -21,8 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
 
         private final PostService postService;
 
-        public PostRestController(PostService postService) {
+        private final PostTestService postTestService;
+
+
+        public PostRestController(PostService postService, PostTestService postTestService) {
             this.postService = postService;
+            this.postTestService = postTestService;
         }
 
         @GetMapping("/api/post/{id}")
@@ -53,7 +59,7 @@ import org.springframework.web.bind.annotation.RestController;
         public ResponseEntity<Object> deletePost(@PathVariable Integer id,
             @RequestBody RequestPostDto requestPostDto) {
 
-            ResponsePostDTO dto = postService.deletePost(id, requestPostDto);
+            postService.deletePost(id, requestPostDto);
 
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 
@@ -64,6 +70,19 @@ import org.springframework.web.bind.annotation.RestController;
         public ResponsePostDTO savePost(@RequestBody RequestPostDto requestPostDto) {
 
             return postService.savePost(requestPostDto);
+        }
+
+        @PostMapping("/api/test")
+        public void testDTO(@RequestBody PostDTO dto){
+
+            postTestService.savePost(dto);
+
+        }
+
+        @GetMapping("/api/test/{userId}")
+        public List<PostDTO> getPostList(@PathVariable String userId){
+            log.info(postTestService.getPostByUserId(userId));
+            return postTestService.getPostByUserId(userId);
         }
 
 

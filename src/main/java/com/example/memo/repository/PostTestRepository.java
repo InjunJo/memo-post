@@ -9,4 +9,6 @@ public interface PostTestRepository extends JpaRepository<PostTest,String> {
 
     List<PostTest> findAllByUser(User user);
 
+    List<PostTest> findAllByUser_UserId(String id);
+
 }

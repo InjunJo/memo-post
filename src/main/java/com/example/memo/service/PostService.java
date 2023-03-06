@@ -68,9 +68,9 @@ public class PostService {
 
            throw new PostPwdNotCorrectException();
         }
-
-
     }
+
+
 
     public List<ResponsePostDTO> getPostList(){
 
