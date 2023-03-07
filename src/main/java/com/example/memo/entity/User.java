@@ -24,8 +24,8 @@ public class User {
     @Column(nullable = false, name = "USER_PWD")
     private String password;
 
-    @OneToMany(mappedBy = "user")
-    private List<Post> posts = new ArrayList<>();
+    /*@OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();*/
     public User() {
     }
 

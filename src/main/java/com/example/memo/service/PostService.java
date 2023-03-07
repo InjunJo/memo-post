@@ -2,10 +2,12 @@ package com.example.memo.service;
 
 import com.example.memo.dto.ReqPostDto;
 import com.example.memo.dto.RespPostDto;
+import com.example.memo.entity.Comment;
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;
 import com.example.memo.execption.NotAuthException;
 import com.example.memo.execption.NotFoundPostException;
+import com.example.memo.repository.CommentJpaRepository;
 import com.example.memo.repository.PostJpaRepository;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
 
     private final PostJpaRepository postRepo;
+
+    private final CommentJpaRepository commentRepo;
 
     private final UserService userService;
 
@@ -36,20 +40,34 @@ public class PostService {
         return new RespPostDto(post);
     }
 
-    public List<RespPostDto> getPostList(){
+    public void getPosts(){
 
         List<Post> posts = postRepo.findAllByOrderByModifiedAtDesc();
-
-        return posts.stream().map(RespPostDto::new).collect(Collectors.toList());
+/*
+        return posts.stream().map(RespPostDto::new).collect(Collectors.toList());*/
 
     }
 
-    public RespPostDto getPost(Long postId){
+    public void getPostDto(Long postId){
 
         Post post = postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
 
+        List<Comment> comments = commentRepo.findAllByPostIs(post);
+
+        log.info(comments.size()+".............");
+
+        post.setComments(comments);
+
+
         return new RespPostDto(post);
     }
+
+    @Transactional
+    protected Post getPost(Long postId){
+
+        return postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
+    }
+
 
     @Transactional
     public RespPostDto updatePost(Long postId, ReqPostDto dto, HttpServletRequest req){

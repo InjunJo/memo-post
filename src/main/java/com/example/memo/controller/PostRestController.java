@@ -36,15 +36,17 @@ public class PostRestController {
     }
 
     @GetMapping("/api/posts")
-    public List<RespPostDto> getPostList() {
-
-        return postService.getPostList();
+    public void getPosts() {
+        log.info("getPosts.......");
+        postService.getPosts();
+        /*
+        return postService.getPosts();*/
     }
 
     @GetMapping("/api/post/{id}")
     public ResponseEntity<RespPostDto> getPost(@PathVariable Long id) {
 
-        RespPostDto dto = postService.getPost(id);
+        RespPostDto dto = postService.getPostDto(id);
 
         return ResponseEntity.ok(dto);
 
