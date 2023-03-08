@@ -37,7 +37,7 @@ public class PostRestController {
 
     @GetMapping("/api/posts")
     public void getPosts() {
-        log.info("getPosts.......");
+        log.warn("getPosts.......");
         postService.getPosts();
         /*
         return postService.getPosts();*/
@@ -48,17 +48,19 @@ public class PostRestController {
 
         RespPostDto dto = postService.getPostDto(id);
 
+
+
         return ResponseEntity.ok(dto);
 
     }
 
     @PutMapping("/api/post/{id}")
-    public ResponseEntity<RespPostDto> updatePost(@PathVariable Long id,
+    public ResponseMsg updatePost(@PathVariable Long id,
         @RequestBody ReqPostDto dto, HttpServletRequest req) {
 
         RespPostDto respDto = postService.updatePost(id, dto,req);;
 
-        return ResponseEntity.status(HttpStatus.OK).body(respDto);
+        return new ResponseMsg("토큰 없음");
     }
 
     @DeleteMapping("/api/post/{id}")

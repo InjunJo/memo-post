@@ -17,9 +17,7 @@ public class RespPostDto {
     private final Long id;
     private final String head;
     private final String content;
-
-    private List<Comment> comments = new ArrayList<>();
-
+    private final  String user_id;
 
     @JsonFormat(pattern = "yyyy/MM/dd/HH:mm:ss")
     private LocalDateTime createdAt;
@@ -27,7 +25,9 @@ public class RespPostDto {
     @JsonFormat(pattern = "yyyy/MM/dd/HH:mm:ss")
     private LocalDateTime modifiedAt;
 
-    public RespPostDto(Post post,List<Comment> comments){
+    private List<RespCommentDto> comments = new ArrayList<>();
+
+    public RespPostDto(Post post){
         Objects.requireNonNull(post);
 
         this.id = post.getId();
@@ -35,9 +35,10 @@ public class RespPostDto {
         this.content = post.getContent();
         this.createdAt = post.getCreatedAt();
         this.modifiedAt = post.getModifiedAt();
+        this.user_id = post.getUser().getUserId();
+    }
 
-        if(comments != null){
-            this.comments = comments;
-        }
+    public void setComments(List<RespCommentDto> comments) {
+        this.comments = comments;
     }
 }

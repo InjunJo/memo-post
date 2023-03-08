@@ -6,6 +6,7 @@ import com.example.memo.execption.NotFoundPostException;
 import com.example.memo.response.ResponseMsg;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -21,5 +22,12 @@ public class UserControllerAdvice {
     public ResponseEntity<Object> handleDuplicatedUser(){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMsg("이미 존재하는 사용자"));
     }
+
+    /*@ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handlePatten(){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMsg("오류!!"));
+    }
+*/
+
 
 }

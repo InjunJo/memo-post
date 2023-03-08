@@ -30,9 +30,9 @@ public class Post extends TimeStamp{
     @Column(name = "CONTENTS")
     private String content;
 
-    /*@ManyToOne
+    @ManyToOne
     @JoinColumn(name = "USER_ID")
-    private User user;*/
+    private User user;
 
     public Post() {
     }

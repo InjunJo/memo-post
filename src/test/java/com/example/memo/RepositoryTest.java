@@ -17,7 +17,7 @@ public class RepositoryTest {
 
     @Test
     void test1(){
-        System.out.println(commentRepo);
+        System.out.println(commentRepo.listOfPost(1L));
     }
 
 }

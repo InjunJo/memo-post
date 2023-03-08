@@ -1,6 +1,7 @@
 package com.example.memo.service;
 
 import com.example.memo.dto.ReqPostDto;
+import com.example.memo.dto.RespCommentDto;
 import com.example.memo.dto.RespPostDto;
 import com.example.memo.entity.Comment;
 import com.example.memo.entity.Post;
@@ -43,23 +44,24 @@ public class PostService {
     public void getPosts(){
 
         List<Post> posts = postRepo.findAllByOrderByModifiedAtDesc();
+
+        log.info(posts);
 /*
-        return posts.stream().map(RespPostDto::new).collect(Collectors.toList());*/
+        return posts.stream().map(p -> new  ).collect(Collectors.toList());*/
 
     }
 
-    public void getPostDto(Long postId){
+    public RespPostDto getPostDto(Long postId){
 
         Post post = postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
 
-        List<Comment> comments = commentRepo.findAllByPostIs(post);
+        List<RespCommentDto> commentDtos = commentRepo.listOfPost(postId)
+            .stream().map(RespCommentDto::new).toList();
 
-        log.info(comments.size()+".............");
+        RespPostDto respPostDto = new RespPostDto(post);
+        respPostDto.setComments(commentDtos);
 
-        post.setComments(comments);
-
-
-        return new RespPostDto(post);
+        return respPostDto;
     }
 
     @Transactional

@@ -2,6 +2,7 @@ package com.example.memo;
 
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;
+import com.example.memo.repository.CommentJpaRepository;
 import com.example.memo.repository.PostJpaRepository;
 import com.example.memo.repository.UserJpaRepository;
 import com.example.memo.service.PostService;
@@ -26,6 +27,9 @@ class MemoApplicationTests {
 
     @Autowired
     private UserJpaRepository userJpaRepository;
+
+    @Autowired
+    private CommentJpaRepository commentRepo;
 
     @PersistenceContext
     private EntityManager em;
@@ -104,8 +108,15 @@ class MemoApplicationTests {
 
         User user = op.get();
 
-        System.out.println(user.getPosts());
 
+    }
+
+    @Test
+    void listOfPost(){
+
+        User user = userJpaRepository.findById("dignzh").get();
+
+        System.out.println(commentRepo.listOfPost(user));
     }
 
 
