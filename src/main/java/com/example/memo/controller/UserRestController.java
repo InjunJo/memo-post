@@ -1,7 +1,7 @@
 package com.example.memo.controller;
 
+import com.example.memo.dto.ReqLoginDto;
 import com.example.memo.dto.UserDto;
-import com.example.memo.execption.DuplicateUserException;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.response.ResponseMsg;
 import com.example.memo.service.UserService;
@@ -25,10 +25,11 @@ public class UserRestController {
 
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@RequestBody @Valid UserDto dto, HttpServletResponse resp)
+    public ResponseEntity<Object> login(@RequestBody @Valid ReqLoginDto dto, HttpServletResponse resp)
         throws NotValidatedTokenException {
-
-        log.info("Login......." + dto);
+        
+        //fixme : 해당 log에 대한 사용 목적이 확실하지 않음으로 일단 주석 처리
+        /*log.info("Login......." + dto.getUserId());*/
 
         userService.login(dto, resp);
 
@@ -37,16 +38,14 @@ public class UserRestController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@RequestBody UserDto dto) {
-        log.info("signUp......." + dto);
+
+        //fixme : 해당 log에 대한 사용 목적이 확실하지 않음으로 일단 주석 처리
+        /*log.info("signUp......." + dto);*/
 
         userService.singUp(dto);
 
         return ResponseEntity.ok(new ResponseMsg("회원가입 완료"));
     }
 
-    @PostMapping("/signup/admin")
-    public void CreateAdmin(@RequestBody UserDto dto) {
-
-    }
 
 }

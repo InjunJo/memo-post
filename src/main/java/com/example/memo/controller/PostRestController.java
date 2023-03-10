@@ -3,6 +3,7 @@ package com.example.memo.controller;
 
 import com.example.memo.dto.ReqPostDto;
 import com.example.memo.dto.RespPostDto;
+import com.example.memo.dto.UserDetail;
 import com.example.memo.entity.User;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotFoundUserException;
@@ -32,11 +33,31 @@ public class PostRestController {
 
     private final UserService userService;
 
+
+    //todo : 중복되는 코드를 제거하기 위해 Filter라는 공통 메소드를 만드는 과정에서, User를 반환하는 메소드에서 예외 처리 시 ResponseEntity를 반환하는 문제
+    /*private User userFilter(HttpServletRequest req){
+
+        User user = null;
+
+        try{
+
+            user = userService.authorizeByToken(req);
+
+        }catch (NotValidatedTokenException | NotFoundUserException e){
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("해당 권한이 없습니다"));
+        }
+
+        return user;
+    }*/
+
     @PostMapping("/api/post")
-    public ResponseEntity<RespPostDto> registerPost(@RequestBody ReqPostDto reqPostDto,
+    public ResponseEntity<Object> registerPost(@RequestBody ReqPostDto reqPostDto,
         HttpServletRequest req) {
 
-        RespPostDto postDto = postService.savePost(reqPostDto, req);
+        UserDetail userDetail = userService.authorizeByToken(req);
+
+        RespPostDto postDto = postService.savePost(reqPostDto, userDetail);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postDto);
     }
@@ -58,38 +79,24 @@ public class PostRestController {
     }
 
     @PutMapping("/api/post/{id}")
-    public ResponseEntity<RespPostDto> updatePost(@PathVariable Long id,
+    public ResponseEntity<Object> updatePost(@PathVariable Long id,
         @RequestBody ReqPostDto dto, HttpServletRequest req) {
 
-        RespPostDto respDto = postService.updatePost(id, dto, req);
+        UserDetail detail = userService.authorizeByToken(req);;
+
+        RespPostDto respDto = postService.updatePost(id,dto,detail);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(respDto);
     }
 
-    /**
-     * @param id
-     * @param req
-     * @return
-     * @throws NotValidatedTokenException
-     * @throws NotFoundUserException
-     */
 
     @DeleteMapping("/api/post/{id}")
     public ResponseEntity<Object> deletePost(@PathVariable Long id,
         HttpServletRequest req) {
 
-        User user = null;
+        UserDetail detail = userService.authorizeByToken(req);;
 
-        try{
-
-            user = userService.authorizeByToken(req);
-
-        }catch (NotValidatedTokenException | NotFoundUserException e){
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("해당 권한이 없습니다"));
-        }
-
-        postService.deletePost(id, user);
+        postService.deletePost(id, detail);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(new ResponseMsg("게시글 삭제 완료"));

@@ -1,5 +1,6 @@
 package com.example.memo;
 
+import com.example.memo.entity.Comment;
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;
 import com.example.memo.repository.CommentJpaRepository;
@@ -115,6 +116,12 @@ class MemoApplicationTests {
     void listOfPost(){
 
         User user = userJpaRepository.findById("dignzh").get();
+
+    }
+
+    void createComment(){
+
+        Comment comment = new Comment();
 
     }
 

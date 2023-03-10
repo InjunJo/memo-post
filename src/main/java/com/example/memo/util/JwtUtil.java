@@ -1,5 +1,7 @@
 package com.example.memo.util;
 
+import com.example.memo.dto.UserDetail;
+import com.example.memo.entity.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -25,6 +27,8 @@ public class JwtUtil {
     public static final String HEADER_KEY = "Authorization";
 
     public static final String VALUE_PREFIX = "Bearer ";
+
+    public static final String AUTHORIZATION_KEY = "auth";
 
 
     private final Long EXPIRATION_TIME = 60 * 60 * 1000L;
@@ -55,13 +59,14 @@ public class JwtUtil {
         return null;
     }
 
-    public String createToken(String userId){
+    public String createToken(UserDetail detail){
 
         Date date = new Date();
 
+
         return VALUE_PREFIX+
             Jwts.builder()
-            .setSubject(userId)
+            .setSubject(detail.getUserId()).claim(AUTHORIZATION_KEY, detail.getRole())
             .setIssuedAt(date)
             .setExpiration(new Date(date.getTime()+EXPIRATION_TIME))
             .signWith(key,SIGNATURE_ALGORITHM).compact();

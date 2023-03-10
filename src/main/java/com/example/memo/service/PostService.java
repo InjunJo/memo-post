@@ -2,13 +2,13 @@ package com.example.memo.service;
 
 import com.example.memo.dto.ReqPostDto;
 import com.example.memo.dto.RespPostDto;
+import com.example.memo.dto.UserDetail;
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;
-import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotAuthorizationException;
-import com.example.memo.execption.NotFoundPostException;
-import com.example.memo.execption.NotFoundUserException;
+import com.example.memo.execption.NotFoundContentException;
 import com.example.memo.repository.PostJpaRepository;
+import com.example.memo.repository.UserJpaRepository;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,11 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-@Transactional(rollbackFor = {NotValidatedTokenException.class, NotFoundUserException.class})
+@Transactional
 public class PostService {
 
     private final PostJpaRepository postRepo;
-    private final UserService userService;
+    private final UserJpaRepository userRepo;
 
     /**
      * 요청 받은 Post 정보를 DB에 저장하는 역할을 한다
@@ -34,12 +34,10 @@ public class PostService {
      * @throws NotAuthorizationException
      */
 
-    public RespPostDto savePost(ReqPostDto dto, HttpServletRequest req)
-        throws NotValidatedTokenException, NotFoundUserException {
-
-        User user = userService.authorizeByToken(req);
+    public RespPostDto savePost(ReqPostDto dto, UserDetail detail) {
 
         Post post = new Post(dto);
+        User user = userRepo.findById(detail.getUserId()).get();
 
         post.setUser(user);
         postRepo.save(post);
@@ -63,7 +61,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public RespPostDto getPostDto(Long postId) throws NotFoundPostException {
+    public RespPostDto getPostDto(Long postId) throws NotFoundContentException {
 
         Post post = getPost(postId);
 
@@ -75,12 +73,12 @@ public class PostService {
      *
      * @param postId 특정 Post를 찾기 위한 Post Id 값
      * @return 찾은 Post를 {@link Post} 로 반환 한다
-     * @throws NotFoundPostException postId에 해당 하는 Post가 존재 하지 않을 시
+     * @throws NotFoundContentException postId에 해당 하는 Post가 존재 하지 않을 시
      */
     @Transactional(readOnly = true)
-    protected Post getPost(Long postId) throws NotFoundPostException {
+    protected Post getPost(Long postId) throws NotFoundContentException {
 
-        return postRepo.findById(postId).orElseThrow(NotFoundPostException::new);
+        return postRepo.findById(postId).orElseThrow(NotFoundContentException::new);
     }
 
     /**
@@ -93,21 +91,29 @@ public class PostService {
      * @throws NotAuthorizationException 해당 Post에 대한 수정 권한이 없을 시
      */
 
-    public RespPostDto updatePost(Long postId, ReqPostDto dto, HttpServletRequest req)
-        throws NotAuthorizationException, NotValidatedTokenException, NotFoundUserException {
+    //consider : update와 delete에서 발생하는 코드의 중복을 어떻게 제거 할 것인가?
 
-        User user = userService.authorizeByToken(req);
+    public RespPostDto updatePost(Long postId, ReqPostDto dto, UserDetail detail)
+        throws NotAuthorizationException {
 
         Post post = getPost(postId);
 
-        if (matchUserAndPost(user, post)) {
-            post.update(dto);
+        if(detail.isAdmin()){
+            log.info("[admin update post] id : "+post.getId());
 
             return new RespPostDto(post);
 
-        } else {
+        }else{
+            if (matchUserAndPost(detail, post)) {
+                post.update(dto);
 
-            throw new NotAuthorizationException();
+                return new RespPostDto(post);
+
+            } else {
+
+                throw new NotAuthorizationException();
+            }
+
         }
 
     }
@@ -121,24 +127,33 @@ public class PostService {
      * @throws NotAuthorizationException 해당 {@link Post}에 대한 삭제 권한이 없을 시
      */
 
-    public void deletePost(Long postId,User user)
+
+    public void deletePost(Long postId,UserDetail detail)
         throws NotAuthorizationException{
 
         Post post = getPost(postId);
 
-        if (matchUserAndPost(user, post)) {
+        if(detail.isAdmin()){
+
+            log.info("[admin delete post] id : "+post.getId()+"");
             postRepo.delete(post);
 
-        } else {
+        }else{
 
-            throw new NotAuthorizationException();
+            if (matchUserAndPost(detail, post)) {
+                postRepo.delete(post);
+
+            } else {
+
+                throw new NotAuthorizationException();
+            }
         }
-
     }
 
-    private boolean matchUserAndPost(User user, Post post) {
 
-        String userId = user.getUserId();
+    private boolean matchUserAndPost(UserDetail detail, Post post) {
+
+        String userId = detail.getUserId();
         String userIdFromPost = post.getUser().getUserId();
 
         return userId.equals(userIdFromPost);
