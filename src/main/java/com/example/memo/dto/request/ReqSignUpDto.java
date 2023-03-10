@@ -1,15 +1,13 @@
-package com.example.memo.dto;
+package com.example.memo.dto.request;
 
 import com.example.memo.entity.UserRole;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 @Getter
 @ToString
-public class UserDto {
+public class ReqSignUpDto {
 
     @Pattern(regexp = "^[a-z0-9]{4,10}$")
     private final String userId;
@@ -19,7 +17,7 @@ public class UserDto {
     private final String userRole;
     private final String adminKey;
 
-    public UserDto(String userId, String password, String userRole, String adminKey) {
+    public ReqSignUpDto(String userId, String password, String userRole, String adminKey) {
         this.userId = userId;
         this.password = password;
 

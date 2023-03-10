@@ -1,6 +1,6 @@
 package com.example.memo.entity;
 
-import com.example.memo.dto.ReqPostDto;
+import com.example.memo.dto.request.ReqPostDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;

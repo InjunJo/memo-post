@@ -1,6 +1,6 @@
 package com.example.memo.entity;
 
-import com.example.memo.dto.UserDto;
+import com.example.memo.dto.request.ReqSignUpDto;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -34,7 +34,7 @@ public class User {
     public User() {
     }
 
-    public User(UserDto dto){
+    public User(ReqSignUpDto dto){
 
         Objects.requireNonNull(dto);
 

@@ -1,12 +1,9 @@
 package com.example.memo.controller;
 
 
-import com.example.memo.dto.ReqPostDto;
-import com.example.memo.dto.RespPostDto;
+import com.example.memo.dto.request.ReqPostDto;
+import com.example.memo.dto.response.RespPostDto;
 import com.example.memo.dto.UserDetail;
-import com.example.memo.entity.User;
-import com.example.memo.execption.NotValidatedTokenException;
-import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.response.ResponseMsg;
 import com.example.memo.service.PostService;
 import com.example.memo.service.UserService;
@@ -32,24 +29,6 @@ public class PostRestController {
     private final PostService postService;
 
     private final UserService userService;
-
-
-    //todo : 중복되는 코드를 제거하기 위해 Filter라는 공통 메소드를 만드는 과정에서, User를 반환하는 메소드에서 예외 처리 시 ResponseEntity를 반환하는 문제
-    /*private User userFilter(HttpServletRequest req){
-
-        User user = null;
-
-        try{
-
-            user = userService.authorizeByToken(req);
-
-        }catch (NotValidatedTokenException | NotFoundUserException e){
-
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("해당 권한이 없습니다"));
-        }
-
-        return user;
-    }*/
 
     @PostMapping("/api/post")
     public ResponseEntity<Object> registerPost(@RequestBody ReqPostDto reqPostDto,

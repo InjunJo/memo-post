@@ -1,7 +1,7 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.ReqPostDto;
-import com.example.memo.dto.RespPostDto;
+import com.example.memo.dto.request.ReqPostDto;
+import com.example.memo.dto.response.RespPostDto;
 import com.example.memo.dto.UserDetail;
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;

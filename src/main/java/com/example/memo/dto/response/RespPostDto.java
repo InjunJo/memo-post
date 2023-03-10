@@ -1,5 +1,6 @@
-package com.example.memo.dto;
+package com.example.memo.dto.response;
 
+import com.example.memo.dto.response.RespCommentDto;
 import com.example.memo.entity.Post;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class RespPostDto {
     @JsonFormat(pattern = "yyyy/MM/dd/HH:mm:ss")
     private LocalDateTime modifiedAt;
 
-    private List<RespComment> comments = new ArrayList<>();
+    private List<RespCommentDto> comments = new ArrayList<>();
 
     public RespPostDto(Post post){
         Objects.requireNonNull(post);
@@ -38,6 +39,6 @@ public class RespPostDto {
         this.user_id = post.getUser().getUserId();
 
         comments = post.getComments().stream()
-            .map(RespComment::new).collect(Collectors.toList());
+            .map(RespCommentDto::new).collect(Collectors.toList());
     }
 }

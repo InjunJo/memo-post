@@ -1,4 +1,4 @@
-package com.example.memo.dto;
+package com.example.memo.dto.request;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

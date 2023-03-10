@@ -1,7 +1,7 @@
 package com.example.memo.controller;
 
-import com.example.memo.dto.ReqLoginDto;
-import com.example.memo.dto.UserDto;
+import com.example.memo.dto.request.ReqLoginDto;
+import com.example.memo.dto.request.ReqSignUpDto;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.response.ResponseMsg;
 import com.example.memo.service.UserService;
@@ -37,7 +37,7 @@ public class UserRestController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> signUp(@RequestBody UserDto dto) {
+    public ResponseEntity<Object> signUp(@RequestBody ReqSignUpDto dto) {
 
         //fixme : 해당 log에 대한 사용 목적이 확실하지 않음으로 일단 주석 처리
         /*log.info("signUp......." + dto);*/

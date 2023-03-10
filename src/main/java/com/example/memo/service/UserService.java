@@ -1,8 +1,8 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.ReqLoginDto;
+import com.example.memo.dto.request.ReqLoginDto;
 import com.example.memo.dto.UserDetail;
-import com.example.memo.dto.UserDto;
+import com.example.memo.dto.request.ReqSignUpDto;
 import com.example.memo.entity.User;
 import com.example.memo.entity.UserRole;
 import com.example.memo.execption.DuplicateUserException;
@@ -38,7 +38,7 @@ public class UserService {
      */
 
     @Transactional
-    public void singUp(UserDto dto) throws DuplicateUserException {
+    public void singUp(ReqSignUpDto dto) throws DuplicateUserException {
 
         Objects.requireNonNull(dto);
 
@@ -65,7 +65,7 @@ public class UserService {
      *
      * @param dto JWT 토큰을 발행하기 위해 필요한 User 정보. id와 pwd를 담고 있다.
      * @param resp JWT 토큰 생성 후 토큰을 담기 위한 HttpRequest
-     * @throws NotValidatedTokenException 로그인을 위한 정보가 담긴 {@link UserDto}의 userId와 일치 하는 실제 유저가 없을 시
+     * @throws NotValidatedTokenException 로그인을 위한 정보가 담긴 {@link ReqSignUpDto}의 userId와 일치 하는 실제 유저가 없을 시
      */
 
     public void login(ReqLoginDto dto, HttpServletResponse resp) throws NotValidatedTokenException {
