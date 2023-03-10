@@ -63,7 +63,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public RespPostDto getPostDto(Long postId) {
+    public RespPostDto getPostDto(Long postId) throws NotFoundPostException {
 
         Post post = getPost(postId);
 
@@ -121,10 +121,8 @@ public class PostService {
      * @throws NotAuthorizationException 해당 {@link Post}에 대한 삭제 권한이 없을 시
      */
 
-    public void deletePost(Long postId, HttpServletRequest req)
-        throws NotAuthorizationException, NotValidatedTokenException, NotFoundUserException {
-
-        User user = userService.authorizeByToken(req);
+    public void deletePost(Long postId,User user)
+        throws NotAuthorizationException{
 
         Post post = getPost(postId);
 

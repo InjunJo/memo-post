@@ -36,7 +36,7 @@ public class UserRestController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<Object> signUp(@RequestBody UserDto dto) throws DuplicateUserException {
+    public ResponseEntity<Object> signUp(@RequestBody UserDto dto) {
         log.info("signUp......." + dto);
 
         userService.singUp(dto);

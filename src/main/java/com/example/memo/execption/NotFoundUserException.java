@@ -1,5 +1,5 @@
 package com.example.memo.execption;
 
-public class NotFoundUserException extends Exception{
+public class NotFoundUserException extends RuntimeException{
 
 }

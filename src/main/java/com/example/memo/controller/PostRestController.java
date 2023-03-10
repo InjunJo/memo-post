@@ -3,10 +3,12 @@ package com.example.memo.controller;
 
 import com.example.memo.dto.ReqPostDto;
 import com.example.memo.dto.RespPostDto;
+import com.example.memo.entity.User;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.response.ResponseMsg;
 import com.example.memo.service.PostService;
+import com.example.memo.service.UserService;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -19,34 +21,34 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Log4j2
 @RequiredArgsConstructor
-@RequestMapping("/api")
 public class PostRestController {
 
     private final PostService postService;
 
-    @PostMapping("/post")
-    public ResponseEntity<RespPostDto> upLoadPost(@RequestBody ReqPostDto reqPostDto,
-        HttpServletRequest req) throws NotValidatedTokenException, NotFoundUserException {
+    private final UserService userService;
 
-        RespPostDto postDto = postService.savePost(reqPostDto,req);
+    @PostMapping("/api/post")
+    public ResponseEntity<RespPostDto> registerPost(@RequestBody ReqPostDto reqPostDto,
+        HttpServletRequest req) {
+
+        RespPostDto postDto = postService.savePost(reqPostDto, req);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postDto);
     }
 
-    @GetMapping("/posts")
+    @GetMapping("/api/posts")
     public List<RespPostDto> findAllPosts() {
         log.warn("getPosts.......");
 
         return postService.getPosts();
     }
 
-    @GetMapping("/post/{id}")
+    @GetMapping("/api/post/{id}")
     public ResponseEntity<RespPostDto> findPostById(@PathVariable Long id) {
 
         RespPostDto dto = postService.getPostDto(id);
@@ -55,18 +57,16 @@ public class PostRestController {
 
     }
 
-    @PutMapping("/post/{id}")
+    @PutMapping("/api/post/{id}")
     public ResponseEntity<RespPostDto> updatePost(@PathVariable Long id,
-        @RequestBody ReqPostDto dto, HttpServletRequest req)
-        throws NotValidatedTokenException, NotFoundUserException {
+        @RequestBody ReqPostDto dto, HttpServletRequest req) {
 
-        RespPostDto respDto = postService.updatePost(id, dto,req);
+        RespPostDto respDto = postService.updatePost(id, dto, req);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(respDto);
     }
 
     /**
-     *
      * @param id
      * @param req
      * @return
@@ -74,11 +74,22 @@ public class PostRestController {
      * @throws NotFoundUserException
      */
 
-    @DeleteMapping("/post/{id}")
+    @DeleteMapping("/api/post/{id}")
     public ResponseEntity<Object> deletePost(@PathVariable Long id,
-        HttpServletRequest req) throws NotValidatedTokenException, NotFoundUserException {
+        HttpServletRequest req) {
 
-        postService.deletePost(id,req);
+        User user = null;
+
+        try{
+
+            user = userService.authorizeByToken(req);
+
+        }catch (NotValidatedTokenException | NotFoundUserException e){
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("해당 권한이 없습니다"));
+        }
+
+        postService.deletePost(id, user);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(new ResponseMsg("게시글 삭제 완료"));

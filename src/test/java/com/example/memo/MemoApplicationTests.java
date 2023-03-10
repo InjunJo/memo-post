@@ -116,7 +116,6 @@ class MemoApplicationTests {
 
         User user = userJpaRepository.findById("dignzh").get();
 
-        System.out.println(commentRepo.listOfPost(user));
     }
 
 
