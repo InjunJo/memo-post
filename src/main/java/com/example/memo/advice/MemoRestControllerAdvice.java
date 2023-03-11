@@ -1,6 +1,7 @@
 package com.example.memo.advice;
 
 import com.example.memo.execption.DuplicateUserException;
+import com.example.memo.execption.NotAuthenticationException;
 import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotAuthorizationException;
@@ -22,12 +23,14 @@ public class MemoRestControllerAdvice {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseMsg("작업을 수행할 대상 자료 없음"));
     }
-    @ExceptionHandler({NotAuthorizationException.class, NotFoundUserException.class}) // 자료 데이터 변경 작업에 대한 권한이 없을 때
+    @ExceptionHandler({NotAuthorizationException.class}) // 자료 데이터 변경 작업에 대한 권한이 없을 때
     public ResponseEntity<Object> handleNotAuthorization(){
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("해당 권한이 없습니다"));
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMsg("해당 권한이 없습니다"));
     }
 
-    @ExceptionHandler(NotValidatedTokenException.class) //로그인 실패
+    @ExceptionHandler({NotValidatedTokenException.class,NotFoundUserException.class,
+        NotAuthenticationException.class}) //로그인 실패
     public ResponseEntity<Object> handleNotAuthentication(){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("로그인 실패"));
     }

@@ -6,6 +6,7 @@ import com.example.memo.dto.request.ReqSignUpDto;
 import com.example.memo.entity.User;
 import com.example.memo.entity.UserRole;
 import com.example.memo.execption.DuplicateUserException;
+import com.example.memo.execption.NotAuthenticationException;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.repository.UserJpaRepository;
@@ -31,7 +32,8 @@ public class UserService {
     @Value("${admin.key}")
     private String ADMIN_KEY;
 
-    /**User 중복 검사 후 정상 적이면 해당 User 정보를 DB에 저장 한다
+    /**
+     * User 중복 검사 후 정상 적이면 해당 User 정보를 DB에 저장 한다
      *
      * @param dto 회원 가입을 위해 보내온 요청 정보를 담는다.
      * @throws DuplicateUserException 회원 가입 하고자 하는 User ID가 중복 시
@@ -49,11 +51,11 @@ public class UserService {
 
         User user = new User(dto);
 
-        if(dto.isAdmin(ADMIN_KEY)){
+        if (dto.isAdmin(ADMIN_KEY)) {
 
             user.setUserRole(UserRole.ADMIN);
 
-        }else{
+        } else {
 
             user.setUserRole(UserRole.USER);
         }
@@ -61,23 +63,30 @@ public class UserService {
         userRepo.save(user);
     }
 
-    /** 로그인 성공 후 JWT 토콘을 HttpResponse Header에 넣어 준다
+    /**
+     * 로그인 성공 후 JWT 토콘을 HttpResponse Header에 넣어 준다
      *
-     * @param dto JWT 토큰을 발행하기 위해 필요한 User 정보. id와 pwd를 담고 있다.
+     * @param dto  JWT 토큰을 발행하기 위해 필요한 User 정보. id와 pwd를 담고 있다.
      * @param resp JWT 토큰 생성 후 토큰을 담기 위한 HttpRequest
-     * @throws NotValidatedTokenException 로그인을 위한 정보가 담긴 {@link ReqSignUpDto}의 userId와 일치 하는 실제 유저가 없을 시
+     * @throws NotValidatedTokenException 로그인을 위한 정보가 담긴 {@link ReqSignUpDto}의 userId와 일치 하는 실제 유저가
+     *                                    없을 시
      */
 
-    public void login(ReqLoginDto dto, HttpServletResponse resp) throws NotValidatedTokenException {
-
-        Objects.requireNonNull(dto);
+    public UserDetail login(ReqLoginDto dto)
+        throws NotFoundUserException, NotAuthenticationException {
 
         User user = userRepo.findById(dto.getUserId())
-            .orElseThrow(() -> new NotValidatedTokenException("로그인 실패"));
+            .orElseThrow(NotFoundUserException::new);
 
-        String token = jwtUtil.createToken(new UserDetail(user));
+        if (user.getPassword().equals(dto.getPassword())) {
 
-        resp.addHeader(JwtUtil.HEADER_KEY, token);
+            return new UserDetail(user);
+
+        } else {
+
+            throw new NotAuthenticationException("로그인 실패");
+        }
+
     }
 
 
@@ -87,10 +96,10 @@ public class UserService {
      * @param req Request Header에서 토큰을 얻기 위한 Request
      * @return 권한이 있으면 {@link User}를 반환 해준다
      * @throws NotValidatedTokenException 토큰이 존재 하지 않거나 유효 하지 않을 시
-     * @throws NotFoundUserException 유효한 토큰 이지만 저장된 회원 정보가 없을 시
+     * @throws NotFoundUserException      유효한 토큰 이지만 저장된 회원 정보가 없을 시
      */
 
-    public UserDetail authorizeByToken(HttpServletRequest req)
+    /*public UserDetail authorizeByToken(HttpServletRequest req)
         throws NotValidatedTokenException, NotFoundUserException {
 
         String token = jwtUtil.resolveToken(req);
@@ -105,6 +114,6 @@ public class UserService {
         User user = userRepo.findById(userId).orElseThrow(NotFoundUserException::new);
 
         return new UserDetail(user);
-    }
+    }*/
 
 }

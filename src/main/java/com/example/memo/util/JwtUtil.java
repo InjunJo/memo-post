@@ -2,6 +2,8 @@ package com.example.memo.util;
 
 import com.example.memo.dto.UserDetail;
 import com.example.memo.entity.UserRole;
+import com.example.memo.execption.NotFoundUserException;
+import com.example.memo.execption.NotValidatedTokenException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -66,7 +68,8 @@ public class JwtUtil {
 
         return VALUE_PREFIX+
             Jwts.builder()
-            .setSubject(detail.getUserId()).claim(AUTHORIZATION_KEY, detail.getRole())
+            .setSubject(detail.getUserId())
+                .claim(AUTHORIZATION_KEY, detail.getRole().getValue())
             .setIssuedAt(date)
             .setExpiration(new Date(date.getTime()+EXPIRATION_TIME))
             .signWith(key,SIGNATURE_ALGORITHM).compact();
@@ -93,6 +96,15 @@ public class JwtUtil {
     public Claims getClaims(String token){
 
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    }
+
+    public UserDetail authorizeByToken(String token)
+        throws NotValidatedTokenException, NotFoundUserException {
+
+        String userId = getClaims(token).getSubject();
+        String role = getClaims(token).get(JwtUtil.AUTHORIZATION_KEY, String.class);
+
+        return new UserDetail(userId, UserRole.fromStrToUserRole(role));
     }
 
 }

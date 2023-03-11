@@ -4,9 +4,12 @@ package com.example.memo.controller;
 import com.example.memo.dto.request.ReqPostDto;
 import com.example.memo.dto.response.RespPostDto;
 import com.example.memo.dto.UserDetail;
+import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.response.ResponseMsg;
+import com.example.memo.service.AuthenticationService;
 import com.example.memo.service.PostService;
 import com.example.memo.service.UserService;
+import com.example.memo.util.JwtUtil;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,23 +30,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class PostRestController {
 
     private final PostService postService;
+    private final AuthenticationService authService;
 
-    private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @PostMapping("/api/post")
     public ResponseEntity<Object> registerPost(@RequestBody ReqPostDto reqPostDto,
         HttpServletRequest req) {
 
-        UserDetail userDetail = userService.authorizeByToken(req);
+        UserDetail detail
+            = authService.authorizeByToken(filterRequest(req));
 
-        RespPostDto postDto = postService.savePost(reqPostDto, userDetail);
+        RespPostDto postDto = postService.savePost(reqPostDto, detail);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(postDto);
     }
 
     @GetMapping("/api/posts")
     public List<RespPostDto> findAllPosts() {
-        log.warn("getPosts.......");
 
         return postService.getPosts();
     }
@@ -61,7 +65,8 @@ public class PostRestController {
     public ResponseEntity<Object> updatePost(@PathVariable Long id,
         @RequestBody ReqPostDto dto, HttpServletRequest req) {
 
-        UserDetail detail = userService.authorizeByToken(req);;
+        UserDetail detail
+            = authService.authorizeByToken(filterRequest(req));
 
         RespPostDto respDto = postService.updatePost(id,dto,detail);
 
@@ -73,12 +78,26 @@ public class PostRestController {
     public ResponseEntity<Object> deletePost(@PathVariable Long id,
         HttpServletRequest req) {
 
-        UserDetail detail = userService.authorizeByToken(req);;
+
+        UserDetail detail
+            = authService.authorizeByToken(filterRequest(req));
 
         postService.deletePost(id, detail);
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT)
             .body(new ResponseMsg("게시글 삭제 완료"));
+    }
+
+    private String filterRequest (HttpServletRequest req) throws NotValidatedTokenException{
+
+        String token = jwtUtil.resolveToken(req);
+
+        if (token == null || !jwtUtil.validateToken(token)) {
+
+            throw new NotValidatedTokenException("유요하지 않은 토큰");
+        }
+
+        return token;
     }
 
 }

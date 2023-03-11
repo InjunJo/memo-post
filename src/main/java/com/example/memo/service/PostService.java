@@ -60,12 +60,25 @@ public class PostService {
 
     }
 
+    public boolean isPresent(Long postId){
+
+        return getPostDto(postId) != null;
+    }
+
     @Transactional(readOnly = true)
-    public RespPostDto getPostDto(Long postId) throws NotFoundContentException {
+    public RespPostDto getPostDto(Long postId){
 
-        Post post = getPost(postId);
+        RespPostDto dto = null;
 
-        return new RespPostDto(post);
+        try{
+
+            dto = new RespPostDto(getPost(postId));
+
+        }catch (NotFoundContentException ignored){
+
+        }
+
+        return dto;
     }
 
     /**
@@ -149,7 +162,6 @@ public class PostService {
             }
         }
     }
-
 
     private boolean matchUserAndPost(UserDetail detail, Post post) {
 
