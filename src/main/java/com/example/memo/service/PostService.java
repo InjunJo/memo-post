@@ -1,8 +1,8 @@
 package com.example.memo.service;
 
+import com.example.memo.dto.UserDetail;
 import com.example.memo.dto.request.ReqPostDto;
 import com.example.memo.dto.response.RespPostDto;
-import com.example.memo.dto.UserDetail;
 import com.example.memo.entity.Post;
 import com.example.memo.entity.User;
 import com.example.memo.execption.NotAuthorizationException;
@@ -117,7 +117,7 @@ public class PostService {
             return new RespPostDto(post);
 
         }else{
-            if (matchUserAndPost(detail, post)) {
+            if (isMatchUserAndPost(detail, post)) {
                 post.update(dto);
 
                 return new RespPostDto(post);
@@ -140,7 +140,6 @@ public class PostService {
      * @throws NotAuthorizationException 해당 {@link Post}에 대한 삭제 권한이 없을 시
      */
 
-
     public void deletePost(Long postId,UserDetail detail)
         throws NotAuthorizationException{
 
@@ -153,7 +152,7 @@ public class PostService {
 
         }else{
 
-            if (matchUserAndPost(detail, post)) {
+            if (isMatchUserAndPost(detail, post)) {
                 postRepo.delete(post);
 
             } else {
@@ -163,7 +162,7 @@ public class PostService {
         }
     }
 
-    private boolean matchUserAndPost(UserDetail detail, Post post) {
+    private boolean isMatchUserAndPost(UserDetail detail, Post post) {
 
         String userId = detail.getUserId();
         String userIdFromPost = post.getUser().getUserId();

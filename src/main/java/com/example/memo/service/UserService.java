@@ -90,30 +90,4 @@ public class UserService {
     }
 
 
-    /**
-     * 토큰을 통해 해당 작업에 대한 권한이 있는지 확인 한다.
-     *
-     * @param req Request Header에서 토큰을 얻기 위한 Request
-     * @return 권한이 있으면 {@link User}를 반환 해준다
-     * @throws NotValidatedTokenException 토큰이 존재 하지 않거나 유효 하지 않을 시
-     * @throws NotFoundUserException      유효한 토큰 이지만 저장된 회원 정보가 없을 시
-     */
-
-    /*public UserDetail authorizeByToken(HttpServletRequest req)
-        throws NotValidatedTokenException, NotFoundUserException {
-
-        String token = jwtUtil.resolveToken(req);
-
-        if (token == null || !jwtUtil.validateToken(token)) {
-
-            throw new NotValidatedTokenException("토큰이 없거나 유효하지 않은 토큰");
-        }
-
-        String userId = jwtUtil.getClaims(token).getSubject();
-
-        User user = userRepo.findById(userId).orElseThrow(NotFoundUserException::new);
-
-        return new UserDetail(user);
-    }*/
-
 }

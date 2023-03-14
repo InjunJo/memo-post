@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,15 +32,13 @@ public class PostRestController {
 
     private final PostService postService;
     private final AuthenticationService authService;
-
     private final JwtUtil jwtUtil;
 
     @PostMapping("/api/post")
     public ResponseEntity<Object> registerPost(@RequestBody ReqPostDto reqPostDto,
         HttpServletRequest req) {
 
-        UserDetail detail
-            = authService.authorizeByToken(filterRequest(req));
+        UserDetail detail = authService.authorizeByToken(filterRequest(req));
 
         RespPostDto postDto = postService.savePost(reqPostDto, detail);
 
