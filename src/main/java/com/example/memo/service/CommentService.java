@@ -12,9 +12,11 @@ import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.repository.CommentJpaRepository;
 import com.example.memo.repository.PostJpaRepository;
 import com.example.memo.repository.UserJpaRepository;
+import com.example.memo.security.CustomUserDetails;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException.NotFound;
@@ -31,16 +33,20 @@ public class CommentService {
     private final PostJpaRepository postRepo;
 
     @Transactional
-    public void createComment(Long postId, ReqCommentDto dto, UserDetail detail)
+    public RespCommentDto createComment(Long postId, ReqCommentDto dto, UserDetails detail)
         throws NotFoundContentException, NotFoundUserException {
 
-        Post post = postRepo.findById(postId).orElseThrow(NotFoundContentException::new);
+        Post post = postRepo.findById(postId)
+            .orElseThrow(NotFoundContentException::new);
 
-        User user = userRepo.findById(detail.getUserId()).orElseThrow(NotFoundUserException::new);
+        User user = userRepo.findById(detail.getUsername())
+            .orElseThrow(NotFoundUserException::new);
 
         Comment comment = new Comment(dto, user, post);
 
         commentRepo.save(comment);
+
+        return new RespCommentDto(comment);
     }
 
     /**
@@ -58,7 +64,8 @@ public class CommentService {
     }
 
     @Transactional(readOnly = true)
-    public RespCommentDto getCommentDto(Long postId,Long commentId) throws NotFoundContentException {
+    public RespCommentDto getCommentDto(Long postId, Long commentId)
+        throws NotFoundContentException {
 
         postRepo.findById(postId).orElseThrow(NotFoundContentException::new);
 
@@ -76,27 +83,19 @@ public class CommentService {
      */
 
     @Transactional
-    public void deleteComment(Long postId, Long commentId, UserDetail detail)
+    public void deleteComment(Long postId, Long commentId, CustomUserDetails detail)
         throws NotAuthorizationException, NotFoundContentException {
 
         postRepo.findById(postId).orElseThrow(NotFoundContentException::new);
 
         Comment comment = findCommentById(commentId);
 
-        if (detail.isAdmin()) {
+        if (matchUserAndComment(detail, comment) | detail.isAdmin()) {
             commentRepo.delete(comment);
-            log.info("[admin delete comment] id : " + comment.getId());
-
-            //consider : log 작업의 중복을 제거 할 수 있는 방법이 뭐가 있을까? this.getClass()를 통한 방법?
 
         } else {
 
-            if (matchUserAndComment(detail, comment)) {
-                commentRepo.delete(comment);
-            } else {
-                throw new NotAuthorizationException("삭제 권한 없음");
-            }
-
+            throw new NotAuthorizationException("삭제 권한 없음");
         }
 
     }
@@ -115,32 +114,28 @@ public class CommentService {
 
     @Transactional
     public RespCommentDto updateComment(Long postId, Long commentId, ReqCommentDto reqCmt,
-        UserDetail detail) throws NotFoundContentException {
+        CustomUserDetails detail) throws NotFoundContentException {
 
         postRepo.findById(postId).orElseThrow(NotFoundContentException::new);
 
         Comment comment = findCommentById(commentId);
 
-        if (detail.isAdmin()) {
+        if (matchUserAndComment(detail, comment) | detail.isAdmin()) {
+
             comment.update(reqCmt);
-            log.info("[admin update comment] id : " + comment.getId() + "");
 
         } else {
 
-            if (matchUserAndComment(detail, comment)) {
-                comment.update(reqCmt);
-            } else {
-                throw new NotAuthorizationException("수정 권한 없음");
-            }
+            throw new NotAuthorizationException("수정 권한 없음");
         }
 
         return new RespCommentDto(comment);
 
     }
 
-    private boolean matchUserAndComment(UserDetail user, Comment cmt) {
+    private boolean matchUserAndComment(CustomUserDetails user, Comment cmt) {
 
-        return user.getUserId().equals(cmt.getUser().getUserId());
+        return user.getUsername().equals(cmt.getUser().getUserId());
     }
 
 

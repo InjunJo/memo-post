@@ -104,7 +104,7 @@ public class JwtUtil {
         String userId = getClaims(token).getSubject();
         String role = getClaims(token).get(JwtUtil.AUTHORIZATION_KEY, String.class);
 
-        return new UserDetail(userId, UserRole.fromStrToUserRole(role));
+        return new UserDetail(userId, UserRole.ToUserRole(role));
     }
 
 }

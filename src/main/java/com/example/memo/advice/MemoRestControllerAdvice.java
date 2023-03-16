@@ -1,9 +1,7 @@
 package com.example.memo.advice;
 
 import com.example.memo.execption.DuplicateUserException;
-import com.example.memo.execption.NotAuthenticationException;
 import com.example.memo.execption.NotFoundUserException;
-import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.execption.NotAuthorizationException;
 import com.example.memo.execption.NotFoundContentException;
 import com.example.memo.response.ResponseMsg;
@@ -29,15 +27,14 @@ public class MemoRestControllerAdvice {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(new ResponseMsg("해당 권한이 없습니다"));
     }
 
-    @ExceptionHandler({NotValidatedTokenException.class,NotFoundUserException.class,
-        NotAuthenticationException.class}) //로그인 실패
+    @ExceptionHandler({NotFoundUserException.class}) //로그인 실패
     public ResponseEntity<Object> handleNotAuthentication(){
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(new ResponseMsg("로그인 실패"));
     }
     
     @ExceptionHandler(DuplicateUserException.class) //회원 가입에서 중복 아이디가 있을 시
-    public ResponseEntity<Object> handleDuplicatedUser(){
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseMsg("이미 존재 하는 사용자"));
+    public ResponseEntity<Object> handleDuplicatedUser(DuplicateUserException e){
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class) //회원 가입에서 요청한 데이터가 유효성 검증을 통과하지 못할 시 

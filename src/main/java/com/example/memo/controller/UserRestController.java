@@ -5,7 +5,6 @@ import com.example.memo.dto.request.ReqLoginDto;
 import com.example.memo.dto.request.ReqSignUpDto;
 import com.example.memo.execption.NotValidatedTokenException;
 import com.example.memo.response.ResponseMsg;
-import com.example.memo.service.AuthenticationService;
 import com.example.memo.service.UserService;
 import com.example.memo.util.JwtUtil;
 import javax.servlet.http.HttpServletResponse;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Log4j2
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class UserRestController {
 
@@ -41,6 +40,8 @@ public class UserRestController {
 
     @PostMapping("/signup")
     public ResponseEntity<Object> signUp(@RequestBody ReqSignUpDto dto) {
+
+        log.info(dto);
 
         userService.singUp(dto);
 

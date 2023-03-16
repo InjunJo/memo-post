@@ -2,7 +2,7 @@ package com.example.memo.entity;
 
 public enum UserRole {
 
-    ADMIN("admin"), USER("user");
+    ADMIN("ROLE_ADMIN"), USER("ROLE_USER");
 
     private final String role;
 
@@ -15,9 +15,7 @@ public enum UserRole {
         return this.role;
     }
 
-
-    // consider : 스트링으로 받아서 Enum 타입으로 변환 해줍니다
-    public static UserRole fromStrToUserRole(String role){
+    public static UserRole ToUserRole(String role){
 
         for(UserRole userRole : UserRole.values()){
 

@@ -12,8 +12,6 @@ import com.example.memo.execption.NotFoundUserException;
 import com.example.memo.repository.UserJpaRepository;
 import com.example.memo.util.JwtUtil;
 import java.util.Objects;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,12 +44,14 @@ public class UserService {
 
         if (userRepo.findById(dto.getUserId()).isPresent()) {
 
-            throw new DuplicateUserException();
+            throw new DuplicateUserException("중복된 사용자 오류");
         }
 
         User user = new User(dto);
 
-        if (dto.isAdmin(ADMIN_KEY)) {
+        log.info("key match : "+dto.isMatchedAdminKey(ADMIN_KEY));
+
+        if (dto.isMatchedAdminKey(ADMIN_KEY)) {
 
             user.setUserRole(UserRole.ADMIN);
 

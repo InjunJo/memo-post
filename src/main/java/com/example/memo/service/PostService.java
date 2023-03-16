@@ -1,6 +1,5 @@
 package com.example.memo.service;
 
-import com.example.memo.dto.UserDetail;
 import com.example.memo.dto.request.ReqPostDto;
 import com.example.memo.dto.response.RespPostDto;
 import com.example.memo.entity.Post;
@@ -9,6 +8,7 @@ import com.example.memo.execption.NotAuthorizationException;
 import com.example.memo.execption.NotFoundContentException;
 import com.example.memo.repository.PostJpaRepository;
 import com.example.memo.repository.UserJpaRepository;
+import com.example.memo.security.CustomUserDetails;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -34,10 +34,10 @@ public class PostService {
      * @throws NotAuthorizationException
      */
 
-    public RespPostDto savePost(ReqPostDto dto, UserDetail detail) {
+    public RespPostDto savePost(ReqPostDto dto, String userId) throws NotAuthorizationException {
 
         Post post = new Post(dto);
-        User user = userRepo.findById(detail.getUserId()).get();
+        User user = userRepo.findById(userId).orElseThrow(NotAuthorizationException::new);
 
         post.setUser(user);
         postRepo.save(post);
@@ -60,21 +60,16 @@ public class PostService {
 
     }
 
-    public boolean isPresent(Long postId){
-
-        return getPostDto(postId) != null;
-    }
-
     @Transactional(readOnly = true)
-    public RespPostDto getPostDto(Long postId){
+    public RespPostDto getPostDto(Long postId) {
 
         RespPostDto dto = null;
 
-        try{
+        try {
 
             dto = new RespPostDto(getPost(postId));
 
-        }catch (NotFoundContentException ignored){
+        } catch (NotFoundContentException ignored) {
 
         }
 
@@ -104,29 +99,19 @@ public class PostService {
      * @throws NotAuthorizationException 해당 Post에 대한 수정 권한이 없을 시
      */
 
-    //consider : update와 delete에서 발생하는 코드의 중복을 어떻게 제거 할 것인가?
-
-    public RespPostDto updatePost(Long postId, ReqPostDto dto, UserDetail detail)
+    public RespPostDto updatePost(Long postId, ReqPostDto dto, CustomUserDetails detail)
         throws NotAuthorizationException {
 
         Post post = getPost(postId);
 
-        if(detail.isAdmin()){
-            log.info("[admin update post] id : "+post.getId());
+        if (isMatchUserAndPost(detail, post) | detail.isAdmin()) {
+            post.update(dto);
 
             return new RespPostDto(post);
 
-        }else{
-            if (isMatchUserAndPost(detail, post)) {
-                post.update(dto);
+        } else {
 
-                return new RespPostDto(post);
-
-            } else {
-
-                throw new NotAuthorizationException();
-            }
-
+            throw new NotAuthorizationException();
         }
 
     }
@@ -140,31 +125,23 @@ public class PostService {
      * @throws NotAuthorizationException 해당 {@link Post}에 대한 삭제 권한이 없을 시
      */
 
-    public void deletePost(Long postId,UserDetail detail)
-        throws NotAuthorizationException{
+    public void deletePost(Long postId, CustomUserDetails detail)
+        throws NotAuthorizationException {
 
         Post post = getPost(postId);
 
-        if(detail.isAdmin()){
-
-            log.info("[admin delete post] id : "+post.getId()+"");
+        if (isMatchUserAndPost(detail, post) | detail.isAdmin()) {
             postRepo.delete(post);
 
-        }else{
+        } else {
 
-            if (isMatchUserAndPost(detail, post)) {
-                postRepo.delete(post);
-
-            } else {
-
-                throw new NotAuthorizationException();
-            }
+            throw new NotAuthorizationException();
         }
     }
 
-    private boolean isMatchUserAndPost(UserDetail detail, Post post) {
+    private boolean isMatchUserAndPost(CustomUserDetails detail, Post post) {
 
-        String userId = detail.getUserId();
+        String userId = detail.getUsername();
         String userIdFromPost = post.getUser().getUserId();
 
         return userId.equals(userIdFromPost);

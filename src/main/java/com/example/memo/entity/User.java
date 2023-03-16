@@ -40,7 +40,7 @@ public class User {
 
         this.userId = dto.getUserId();
         this.password = dto.getPassword();
-        this.userRole = UserRole.fromStrToUserRole(dto.getUserRole());
+        this.userRole = UserRole.ToUserRole(dto.getUserRole());
     }
 
 }
